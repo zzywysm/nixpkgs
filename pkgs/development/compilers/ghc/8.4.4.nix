@@ -7,6 +7,9 @@
 
 , libiconv ? null, ncurses
 
+, enableDwarf ? !stdenv.targetPlatform.isDarwin &&
+                !stdenv.targetPlatform.isWindows, elfutils # for DWARF support
+
 , useLLVM ? !stdenv.targetPlatform.isx86 || (stdenv.targetPlatform.isMusl && stdenv.hostPlatform != stdenv.targetPlatform)
 , # LLVM is conceptually a run-time-only depedendency, but for
   # non-x86, we need LLVM to bootstrap later stages, so it becomes a
@@ -71,7 +74,8 @@ let
   # Splicer will pull out correct variations
   libDeps = platform: stdenv.lib.optional enableTerminfo [ ncurses ]
     ++ stdenv.lib.optional (!enableIntegerSimple) gmp
-    ++ stdenv.lib.optional (platform.libc != "glibc" && !targetPlatform.isWindows) libiconv;
+    ++ stdenv.lib.optional (platform.libc != "glibc" && !targetPlatform.isWindows) libiconv
+    ++ stdenv.lib.optional enableDwarf elfutils;
 
   toolsForTarget = [
     pkgsBuildTarget.targetPackages.stdenv.cc
@@ -108,6 +112,10 @@ stdenv.mkDerivation (rec {
       name = "D4388.diff";
       sha256 = "0w6sdcvnqjlnlzpvnzw20b80v150ijjyjvs9548ildc1928j0w7s";
     })
+    # Combination backport of
+    #   https://git.haskell.org/ghc.git/commitdiff_plain/cb882fc993b4972f7f212b291229ef9e9ade0af9
+    #   https://git.haskell.org/ghc.git/commitdiff_plain/126aa794743b807b7447545697b96dd165ec3e16
+    ++ stdenv.lib.optional enableDwarf ./ghc-Require-libdw-for-enable-dwarf-unwind-fixed-comma.patch
     ++ stdenv.lib.optional stdenv.isDarwin ./backport-dylib-command-size-limit.patch
     ++ stdenv.lib.optional (targetPlatform.isAarch32 || targetPlatform.isAarch64) (fetchpatch {
       url = "https://git.haskell.org/ghc.git/patch/d8495549ba9d194815c2d0eaee6797fc7c00756a";
@@ -180,6 +188,8 @@ stdenv.mkDerivation (rec {
   ] ++ stdenv.lib.optionals (targetPlatform.isDarwin && targetPlatform.isAarch64) [
     # fix for iOS: https://www.reddit.com/r/haskell/comments/4ttdz1/building_an_osxi386_to_iosarm64_cross_compiler/d5qvd67/
     "--disable-large-address-space"
+  ] ++ stdenv.lib.optional enableDwarf [
+    "--enable-dwarf-unwind"
   ];
 
   # Make sure we never relax`$PATH` and hooks support for compatability.

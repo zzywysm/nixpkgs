@@ -7,6 +7,9 @@
 
 , libiconv ? null, ncurses
 
+, enableDwarf ? !stdenv.targetPlatform.isDarwin &&
+                !stdenv.targetPlatform.isWindows, elfutils # for DWARF support
+
 , # GHC can be built with system libffi or a bundled one.
   libffi ? null
 
@@ -76,7 +79,8 @@ let
   libDeps = platform: stdenv.lib.optional enableTerminfo [ ncurses ]
     ++ [libffi]
     ++ stdenv.lib.optional (!enableIntegerSimple) gmp
-    ++ stdenv.lib.optional (platform.libc != "glibc" && !targetPlatform.isWindows) libiconv;
+    ++ stdenv.lib.optional (platform.libc != "glibc" && !targetPlatform.isWindows) libiconv
+    ++ stdenv.lib.optional enableDwarf elfutils;
 
   toolsForTarget = [
     pkgsBuildTarget.targetPackages.stdenv.cc
@@ -111,7 +115,12 @@ stdenv.mkDerivation (rec {
      extraPrefix = "utils/haddock/";
      stripLen = 1;
    })
-  ];
+  ]
+  # Combination backport of
+  #   https://git.haskell.org/ghc.git/commitdiff_plain/cb882fc993b4972f7f212b291229ef9e9ade0af9
+  #   https://git.haskell.org/ghc.git/commitdiff_plain/126aa794743b807b7447545697b96dd165ec3e16
+  ++ stdenv.lib.optional enableDwarf ./ghc-Require-libdw-for-enable-dwarf-unwind-fixed-comma.patch
+  ;
 
   postPatch = "patchShebangs .";
 
@@ -137,6 +146,8 @@ stdenv.mkDerivation (rec {
     sed -i -e 's|-isysroot /Developer/SDKs/MacOSX10.5.sdk||' configure
   '' + stdenv.lib.optionalString (!stdenv.isDarwin) ''
     export NIX_LDFLAGS+=" -rpath $out/lib/ghc-${version}"
+  '' + stdenv.lib.optionalString enableDwarf ''
+    export NIX_LDFLAGS+=" -L${elfutils}/lib"
   '' + stdenv.lib.optionalString stdenv.isDarwin ''
     export NIX_LDFLAGS+=" -no_dtrace_dof"
   '' + stdenv.lib.optionalString targetPlatform.useAndroidPrebuilt ''
@@ -179,6 +190,8 @@ stdenv.mkDerivation (rec {
     "CONF_GCC_LINKER_OPTS_STAGE2=-fuse-ld=gold"
   ] ++ stdenv.lib.optionals (disableLargeAddressSpace) [
     "--disable-large-address-space"
+  ] ++ stdenv.lib.optional enableDwarf [
+    "--enable-dwarf-unwind"
   ];
 
   # Make sure we never relax`$PATH` and hooks support for compatability.
