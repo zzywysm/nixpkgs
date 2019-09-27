@@ -2,7 +2,7 @@
 
 # build-tools
 , bootPkgs
-, autoconf, automake, coreutils, fetchurl, perl, python3, m4, sphinx
+, autoconf, autoreconfHook, automake, coreutils, fetchurl, perl, python3, m4, sphinx
 , bash
 
 , libiconv ? null, ncurses
@@ -154,7 +154,7 @@ stdenv.mkDerivation (rec {
   # `--with` flags for libraries needed for RTS linker
   configureFlags = [
     "--datadir=$doc/share/doc/ghc"
-    "--with-curses-includes=${ncurses.dev}/include" "--with-curses-libraries=${ncurses.out}/lib"
+    "--with-curses-libraries=${ncurses.out}/lib"
   ] ++ stdenv.lib.optionals (libffi != null) ["--with-system-libffi" "--with-ffi-includes=${targetPackages.libffi.dev}/include" "--with-ffi-libraries=${targetPackages.libffi.out}/lib"
   ] ++ stdenv.lib.optional (targetPlatform == hostPlatform && !enableIntegerSimple) [
     "--with-gmp-includes=${targetPackages.gmp.dev}/include" "--with-gmp-libraries=${targetPackages.gmp.out}/lib"
@@ -170,16 +170,22 @@ stdenv.mkDerivation (rec {
     "--disable-large-address-space"
   ] ++ stdenv.lib.optional enableDwarf [
     "--enable-dwarf-unwind"
+    "--with-libdw-includes=${stdenv.lib.getDev elfutils}/include"
+    "--with-libdw-libs=${stdenv.lib.getLib elfutils}/lib"
   ];
 
   # Make sure we never relax`$PATH` and hooks support for compatability.
   strictDeps = true;
 
+  patches = [
+   ./ghc-dwarf-with.patch
+  ];
+
   # Don’t add -liconv to LDFLAGS automatically so that GHC will add it itself.
 	dontAddExtraLibs = true;
 
   nativeBuildInputs = [
-    perl autoconf automake m4 python3 sphinx
+    perl autoconf autoreconfHook automake m4 python3 sphinx
     ghc bootPkgs.alex bootPkgs.happy bootPkgs.hscolour
   ];
 
