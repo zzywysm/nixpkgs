@@ -399,3 +399,5 @@ documentation.
 ### Fixing a broken package {#sec-haskell-fixing-a-broken-package}
 
 ### Package set generation {#sec-haskell-package-set-generation}
+
+### Packaging a Haskell project
