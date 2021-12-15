@@ -691,14 +691,7 @@ let
       DEBUG_MEMORY_INIT     = option yes;
     });
 
-    misc = let
-      # Use zstd for kernel compression if 64-bit and newer than 5.9, otherwise xz.
-      # i686 issues: https://github.com/NixOS/nixpkgs/pull/117961#issuecomment-812106375
-      useZstd = stdenv.buildPlatform.is64bit && versionAtLeast version "5.9";
-    in {
-      KERNEL_XZ            = mkIf (!useZstd) yes;
-      KERNEL_ZSTD          = mkIf useZstd yes;
-
+    misc = {
       HID_BATTERY_STRENGTH = yes;
       # enabled by default in x86_64 but not arm64, so we do that here
       HIDRAW               = yes;
@@ -713,6 +706,10 @@ let
 
       MODULE_COMPRESS    = whenOlder "5.13" yes;
       MODULE_COMPRESS_XZ = yes;
+
+      # use zstd for kernel compression if newer than 5.9, else xz.
+      KERNEL_XZ          = whenOlder "5.9" yes;
+      KERNEL_ZSTD        = whenAtLeast "5.9" yes;
 
       SYSVIPC            = yes;  # System-V IPC
 
