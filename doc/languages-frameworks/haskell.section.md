@@ -49,7 +49,7 @@ escaping, you sometimes need to extra care when handling attribute names like
 `3dmodels`.
 
 For packages that are part of stackage, we use the version that is currently
-part of [Stackage Nightly](https://www.stackage.org/nightly) as the default
+part of [Stackage Nightly][stackage-nightly] as the default
 version. For all other packages we use the latest version from Hackage.
 Sometimes alternative versions of packages are provided whose attribute names
 are their normal name with their version appended after an underscore, e. g.
@@ -108,7 +108,7 @@ Every package set also re-exposes its GHC as `haskell.packages.*.ghc`.
 
 Every haskell package set has its own haskell-aware `mkDerivation` which is used
 to build its packages. Generally you won't have to interact with this builder
-since [cabal2nix](https://github.com/nixos/cabal2nix) can generate packages
+since [cabal2nix][cabal2nix] can generate packages
 using it for an arbitrary cabal package definition. Still it is useful to know
 the parameters it takes when you need to
 [override](#sec-haskell-overriding-haskell-packages) a generated nix expression.
@@ -148,6 +148,7 @@ If `null` (which is the default value), the one included in `src` is used.
 : Extra flags passed when executing the `build` command of `Setup.hs`.
 
 `haddockFlags`
+: Extra flags passed to `Setup.hs haddock` when building the documentation.
 
 `doCheck`
 : Whether to execute the package's test suite if it has one. Defaults to `true` unless cross-compiling.
@@ -156,9 +157,8 @@ If `null` (which is the default value), the one included in `src` is used.
 : Whether to execute the package's benchmark if it has one. Defaults to `false`.
 
 `doHoogle`
-: Whether to generate a index file for [hoogle](https://wiki.haskell.org/Hoogle)
-as part of `haddockPhase` by passing the
-[--hoogle option](https://haskell-haddock.readthedocs.io/en/latest/invoking.html#cmdoption-hoogle).
+: Whether to generate a index file for [hoogle][hoogle] as part of
+`haddockPhase` by passing the [--hoogle option][haddock-hoogle-option].
 Defaults to `true`.
 
 `doHaddockQuickjump`
@@ -166,16 +166,15 @@ Defaults to `true`.
 Defaults to `true` if supported.
 
 `enableLibraryProfiling`
-: Whether to enable [profiling](https://downloads.haskell.org/~ghc/8.10.7/docs/html/users_guide/profiling.html)
-for libraries contained in the package. Enabled by default if supported.
+: Whether to enable [profiling][profiling] for libraries contained in the
+package. Enabled by default if supported.
 
 `enableExecutableProfiling`
-: Whether to enable [profiling](https://downloads.haskell.org/~ghc/8.10.7/docs/html/users_guide/profiling.html)
-for executables contained in the package. Disabled by default.
+: Whether to enable [profiling][profiling] for executables contained in the
+package. Disabled by default.
 
 `profilingDetail`
-: [Profiling detail level](https://cabal.readthedocs.io/en/latest/cabal-project.html#cfg-field-profiling-detail)
-to set. Defaults to `exported-functions`.
+: [Profiling detail level][profiling-detail] to set. Defaults to `exported-functions`.
 
 `enableSharedExecutables`
 : Whether to link executables dynamically. By default, executables are linked statically.
@@ -196,7 +195,7 @@ Enabled by default if supported.
 
 `hyperlinkSource`
 : Whether to render the source as well as part of the haddock documentation
-by passing [--hyperlinked-source](https://haskell-haddock.readthedocs.io/en/latest/invoking.html#cmdoption-hyperlinked-source).
+by passing [--hyperlinked-source][haddock-hyperlinked-source-option].
 Defaults to `true`.
 
 `isExecutable`
@@ -206,10 +205,10 @@ Defaults to `true`.
 : Whether the package contains a library.
 
 `jailbreak`
-: Whether to execute [jailbreak-cabal](https://github.com/peti/jailbreak-cabal/)
-before `configurePhase` to lift any version version constraints in the cabal file.
-Note that this can't lift version bounds if they are conditional, e. g. if a
-dependency is hidden behind a flag.
+: Whether to execute [jailbreak-cabal][jailbreak-cabal] before `configurePhase`
+to lift any version version constraints in the cabal file. Note that this can't
+lift version bounds if they are conditional, e. g. if a dependency is hidden
+behind a flag.
 
 `enableParallelBuilding`
 : Whether to use the `-j` flag to start multiple GHC jobs in parallel.
@@ -220,12 +219,11 @@ Defaults to 16 as haskell compilation with GHC currently sees a performance regr
 if too many parallel jobs are used.
 
 `doCoverage`
-: Whether to generate and install files needed for
-[HPC](https://downloads.haskell.org/~ghc/8.10.7/docs/html/users_guide/profiling.html#observing-code-coverage).
+: Whether to generate and install files needed for [HPC][haskell-program-coverage].
 Defaults to `false`.
 
 `doHaddock`
-: Wether to build (HTML) documentation using [haddock](https://www.haskell.org/haddock/).
+: Wether to build (HTML) documentation using [haddock][haddock].
 Defaults to `true` if supported.
 
 `testTarget`
@@ -248,8 +246,7 @@ Defaults to `true` if supported.
 Defaults to `false`.
 
 `useCpphs`
-: Whether to enable the [cpphs](https://archives.haskell.org/projects.haskell.org/cpphs/)
-preprocessor. Defaults to `false`.
+: Whether to enable the [cpphs][cpphs] preprocessor. Defaults to `false`.
 
 `enableSeparateBinOutput`
 : Whether to install executables to a separate `bin` output. Defaults to `false`.
@@ -524,7 +521,7 @@ benchmark dependencies which would be excluded by default. Defaults to `false`.
 
 One neat property of `shellFor` is that it allows you to work on multiple
 packages using the same environment in conjunction with
-[cabal.project files](https://cabal.readthedocs.io/en/latest/cabal-project.html).
+[cabal.project files][cabal-project-files].
 Say our example above depends on `distribution-nixpkgs` and we have a project
 file set up for both, we can add the following `shell.nix` expression:
 
@@ -864,3 +861,16 @@ to check if the change you have in mind may be backported.
 This section focuses on how to backport a package update (e. g. a
 bug fix or security release). Fixing a broken package works like
 it does for the unstable branches.
+
+[stackage-nightly]: https://www.stackage.org/nightly
+[cabal2nix]: https://github.com/nixos/cabal2nix
+[hoogle]: https://wiki.haskell.org/Hoogle
+[haddock]: https://www.haskell.org/haddock/
+[haddock-hoogle-option]: https://haskell-haddock.readthedocs.io/en/latest/invoking.html#cmdoption-hoogle
+[haddock-hyperlinked-source-option]: https://haskell-haddock.readthedocs.io/en/latest/invoking.html#cmdoption-hyperlinked-source
+[profiling]: https://downloads.haskell.org/~ghc/8.10.7/docs/html/users_guide/profiling.html
+[haskell-program-coverage]: https://downloads.haskell.org/~ghc/8.10.7/docs/html/users_guide/profiling.html#observing-code-coverage
+[profiling-detail]: https://cabal.readthedocs.io/en/latest/cabal-project.html#cfg-field-profiling-detail
+[jailbreak-cabal]: https://github.com/peti/jailbreak-cabal/
+[cpphs]: https://hackage.haskell.org/package/cpphs
+[cabal-project-files]: https://cabal.readthedocs.io/en/latest/cabal-project.html
