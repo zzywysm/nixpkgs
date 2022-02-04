@@ -602,3 +602,14 @@ pkgs.haskellPackages.shellFor {
 ### Package set generation {#sec-haskell-package-set-generation}
 
 ### Packaging a Haskell project
+
+### Backporting {#sec-haskell-backporting}
+
+Backporting changes to a stable NixOS version in general is covered
+in nixpkgs' `CONTRIBUTING.md` in general. In particular refer to the
+[backporting policy](https://github.com/NixOS/nixpkgs/blob/master/CONTRIBUTING.md#criteria-for-backporting-changes)
+to check if the change you have in mind may be backported.
+
+This section focuses on how to backport a package update (e. g. a
+bug fix or security release). Fixing a broken package works like
+it does for the unstable branches.
