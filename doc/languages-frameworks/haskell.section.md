@@ -593,6 +593,282 @@ pkgs.haskellPackages.shellFor {
 
 ### Overriding a single package
 
+<!-- TODO(@sternenseemann): we should document /somewhere/ that base == null etc. -->
+
+Like many language specific subsystems in nixpkgs, the Haskell infrastructure
+also has its own quirks when it comes to overriding. Overriding of the *inputs*
+to a package at least follows the standard procedure. For example, imagine you
+need to build `nix-tree` with a more recent version of `brick` than the default
+one provided by `haskellPackages`:
+
+```nix
+haskellPackages.nix-tree.override {
+  brick = haskellPackages.brick_0_67;
+}
+```
+
+<!-- TODO(@sternenseemann): This belongs in the next section
+One common problem you may run into with such an override is the build failing
+with “abort because of serious configure-time warning from Cabal”. When scrolling
+up, you'll usually notice that Cabal noticed that more than one versions of the same
+package was present in the dependency graph. This usually causes a later compilation
+failure (the error message `haskellPackages.mkDerivation` produces tries to save
+you the time of finding this out yourself, but if you wish to do so, you can
+disable it using `allowInconsistentDependencies`). Luckily, `haskellPackages` provides
+you with a tool to deal with this. `overrideScope` creates a new `haskellPackages`
+instance with the override applied *globally* for this package, so the dependency
+closure automatically uses a consistent version of the overridden package. E. g.
+if `haskell-ci` needs a recent version of `Cabal`, but also uses other packages
+that depend on that library, you may want to use:
+
+```nix
+haskellPackages.haskell-ci.overrideScope (self: super: {
+  Cabal = self.Cabal_3_6_2_0;
+})
+```
+
+-->
+
+The custom interface comes into play when you want to override the arguments
+passed to `haskellPackages.mkDerivation`. For this, the function `overrideCabal`
+from `haskell.lib.compose` is used. E. g. if you want to install a man page
+that is distributed with the package, you can do something like this:
+
+```nix
+haskell.lib.compose.overrideCabal (drv: {
+  postInstall = ''
+    ${drv.postInstall or ""}
+    install -Dm644 man/pnbackup.1 -t $out/share/man/man1
+  '';
+}) haskellPackages.pnbackup
+```
+
+`overrideCabal` takes two arguments:
+
+1. A function which receives all arguments passed to `haskellPackages.mkDerivation`
+   before and returns a set of arguments to replace (or add) with a new value.
+2. The Haskell derivation to override.
+
+The arguments are ordered so that you can easily create helper functions by making
+use of currying:
+
+```nix
+let
+  installManPage = haskell.lib.compose.overrideCabal (drv: {
+    postInstall = ''
+      ${drv.postInstall or ""}
+      install -Dm644 man/${drv.pname}.1 -t "$out/share/man/man1"
+    '';
+  });
+in
+
+installManPage haskellPackages.pnbackup
+```
+
+In fact, `haskell.lib.compose` already provides lots of useful helpers for common
+tasks, detailed in the next section. They are also structured in such a way that
+they can be combined using `lib.pipe`:
+
+```nix
+lib.pipe my-haskell-package [
+  # lift version bounds on dependencies
+  haskell.lib.compose.doJailbreak
+  # disable building the haddock documentation
+  haskell.lib.compose.dontHaddock
+  # pass extra package flag to Cabal's configure step
+  (haskell.lib.compose.enableCabalFlag "myflag")
+]
+```
+
+#### `haskell.lib.compose`
+
+The base interface for all overriding is the following function:
+
+`overrideCabal f drv`
+: Takes the arguments passed to obtain `drv` to `f` and uses the resulting attribute set
+to update the argument set. Then a recomputed version of `drv` using the new argument
+set is returned.
+
+<!--
+TODO(@sternenseemann): ideally we want to be more detailed here as well, but
+I want to avoid the documentation having to be kept in sync in too many places.
+We already document this stuff in the mkDerivation section and lib/compose.nix.
+Ideally this section would be generated from the latter in the future.
+-->
+
+All other helper functions are implemented in terms of `overrideCabal` and make
+common overrides shorter and more complicate ones trivial. The simple overrides
+which only change a single argument are only described very briefly in the
+following overview. Refer to the
+[documentation of `haskellPackages.mkDerivation`](#haskell-mkderivation)
+for a more detailed description of the effects of the respective arguments.
+
+##### Packaging Helpers
+
+`overrideSrc { src, version } drv`
+: Replace the source used for building `drv` with the path or derivation given
+as `src`. The `version` attribute is optional. Prefer this function over
+overriding `src` via `overrideCabal`, since it also automatically takes care of
+removing any Hackage revisions.
+
+`generateOptparseApplicativeCompletions list drv`
+: Generate and install shell completion files for the installed executables whose
+names are given via `list`. The executables need to be using `optparse-applicative`
+for this to work.
+
+`justStaticExecutables drv`
+: Only build and install the executables produced by `drv`, removing everything
+that may refer to other Haskell packages' store paths (like libraries and
+documentation). This dramatically reduces the closure size of the resulting
+derivation. Note that the executables are only statically linked against their
+Haskell dependencies, but will still link dynamically against libc, GMP and
+other system library dependencies.
+
+`enableSeparateBinOutput drv`
+: Install executables produced by `drv` to a separate `bin` output. This
+has a similar result as `justStaticExecutables`, but preserves the libraries
+and documentation in the `out` output alongside the `bin` output with a
+much smaller closure size.
+
+`markBroken drv`
+: Sets the `broken` flag to `true` for `drv`.
+
+`unmarkBroken drv`
+: Set the `broken` flag to `false` for `drv`.
+
+`doDistribute drv`
+: Updates `hydraPlatforms` so that Hydra will build `drv`. This is
+sometimes necessary when working with versioned packages in
+`haskellPackages` which are not built by default.
+
+`dontDistribute drv`
+: Sets `hydraPlatforms` to `[]`, causing Hydra to skip this package
+altogether. Useful if it fails to evaluate cleanly and is causing
+noise in the evaluation errors tab on Hydra.
+
+##### Development Helpers
+
+`sdistTarball drv`
+: Create a source distribution tarball like those found on Hackage
+instead of building the package `drv`.
+
+`documentationTarball drv`
+: Create a documentation tarball suitable for uploading to Hackage
+instead of building the package `drv`.
+
+`buildFromSdist drv`
+: Uses `sdistTarball drv` as the source to compile `drv`. This helps to catch
+packaging bugs when building from a local directory, e. g. when required files
+are missing from `extra-source-files`.
+
+`failOnAllWarnings drv`
+: Enables all warnings GHC supports and makes it fail the build if any of them
+are emitted.
+
+<!-- TODO(@sternenseemann):
+`checkUnusedPackages opts drv`
+: Adds an extra check to `postBuild` which fails the build if any dependency
+taken as an input is not used. The `opts` attribute set allows relaxing this
+check.
+-->
+
+`enableDWARFDebugging drv`
+: Compiles the package with additional debug symbols enabled, useful
+for debugging with e. g. `gdb`.
+
+`doStrip drv`
+: Sets `doStrip` to `true` for `drv`.
+
+`dontStrip drv`
+: Sets `doStrip` to `false` for `drv`.
+
+<!-- TODO(@sternenseemann): shellAware -->
+
+##### Trivial Helpers
+
+`doJailbreak drv`
+: Sets the `jailbreak` argument to `true` for `drv`.
+
+`dontJailbreak drv`
+: Sets the `jailbreak` argument to `false` for `drv`.
+
+`doHaddock drv`
+: Sets `doHaddock` to `true` for `drv`.
+
+`dontHaddock drv`
+: Sets `doHaddock` to `false` for `drv`. Useful if the build of a package is
+failing because of e. g. a syntax error in the Haddock documentation.
+
+`doHyperlinkSource drv`
+: Sets `hyperlinkSource` to `true` for `drv`.
+
+`dontHyperlinkSource drv`
+: Sets `hyperlinkSource` to `false` for `drv`.
+
+`doCheck drv`
+: Sets `doCheck` to `true` for `drv`.
+
+`dontCheck drv`
+: Sets `doCheck` to `false` for `drv`. Useful if a package has a broken,
+flaky or otherwise problematic test suite breaking the build.
+
+<!-- Purposefully omitting the non-list variants here. They are a bit
+ugly and we may want to deprecate them at some point. -->
+
+`appendConfigureFlags list drv`
+: Adds the strings in `list` to the `configureFlags` argument for `drv`.
+
+`enableCabalFlag flag drv`
+: Makes sure that the Cabal package `flag` is enabled in Cabal's configure step.
+
+`disableCabalFlag flag drv`
+: Makes sure that the Cabal package `flag` is disabled in Cabal's configure step.
+
+`appendBuildflags list drv`
+: Adds the strings in `list` to the `buildFlags` argument for `drv`.
+
+<!-- TODO(@sternenseemann): removeConfigureFlag -->
+
+`appendPatches list drv`
+: Adds the `list` of derivations or paths to the `patches` argument for `drv`.
+
+<!-- TODO(@sternenseemann): link dep section -->
+
+`addBuildTools list drv`
+: Adds the `list` of derivations to the `buildTools` argument for `drv`.
+
+`addExtraLibraries list drv`
+: Adds the `list` of derivations to the `extraLibraries` argument for `drv`.
+
+`addBuildDepends list drv`
+: Adds the `list` of derivations to the `buildDepends` argument for `drv`.
+
+`addTestToolDepends list drv`
+: Adds the `list` of derivations to the `testToolDepends` argument for `drv`.
+
+`addPkgConfigDepends list drv`
+: Adds the `list` of derivations to the `pkg-configDepends` argument for `drv`.
+
+`addSetupDepends list drv`
+: Adds the `list` of derivations to the `setupHaskellDepends` argument for `drv`.
+
+`doBenchmark drv`
+: Set `doBenchmark` to `true` for `drv`. Useful if your development
+environment is missing the dependencies necessary for compiling the
+benchmark component.
+
+`dontBenchmark drv`
+: Set `doBenchmark` to `false` for `drv`.
+
+`setBuildTargets list drv`
+: Sets `buildTargets` argument to `list` for `drv`.
+
+`doCoverage drv`
+: Sets the `doCoverage` argument to `true` for `drv`.
+
+`dontCoverage drv`
+: Sets the `doCoverage` argument to `false` for `drv`.
+
 ### Overriding the entire package set
 
 ## Import-from-Derivation helpers
