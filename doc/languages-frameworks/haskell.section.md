@@ -7,7 +7,7 @@ packaging Haskell-based packages.
 The secondary purpose is to provide support for Haskell development environment
 including prebuilt Haskell libraries. However, in this area sacrifices have been
 made due to self-imposed restrictions in nixpkgs, to lessen the maintenance
-effort and improve performance. Therefore it may be advantageous to use an
+effort and improve performance. Therefore, it may be advantageous to use an
 alternative to the Haskell infrastructure in nixpkgs for development
 environments in some cases. The main limitations are that we only provide
 first-class support for the default compiler (currently GHC 8.10.7) and usually
@@ -52,7 +52,7 @@ For packages that are part of stackage, we use the version that is currently
 part of [Stackage Nightly][stackage-nightly] as the default
 version. For all other packages we use the latest version from Hackage.
 Sometimes alternative versions of packages are provided whose attribute names
-are their normal name with their version appended after an underscore, e. g.
+are their normal name with their version appended after an underscore, e.g.
 `Cabal_3_4_0_0`. If you are interested in details how the package set is
 populated, read the section [Package set
 generation](#sec-haskell-package-set-generation).
@@ -157,7 +157,7 @@ If `null` (which is the default value), the one included in `src` is used.
 : Whether to execute the package's benchmark if it has one. Defaults to `false`.
 
 `doHoogle`
-: Whether to generate a index file for [hoogle][hoogle] as part of
+: Whether to generate an index file for [hoogle][hoogle] as part of
 `haddockPhase` by passing the [--hoogle option][haddock-hoogle-option].
 Defaults to `true`.
 
@@ -206,8 +206,8 @@ Defaults to `true`.
 
 `jailbreak`
 : Whether to execute [jailbreak-cabal][jailbreak-cabal] before `configurePhase`
-to lift any version version constraints in the cabal file. Note that this can't
-lift version bounds if they are conditional, e. g. if a dependency is hidden
+to lift any version constraints in the cabal file. Note that this can't
+lift version bounds if they are conditional, e.g. if a dependency is hidden
 behind a flag.
 
 `enableParallelBuilding`
@@ -227,7 +227,7 @@ Defaults to `false`.
 Defaults to `true` if supported.
 
 `testTarget`
-: Name of the test suite to build and run. If unset, all test suite will be executed.
+: Name of the test suite to build and run. If unset, all test suites will be executed.
 
 `preCompileBuildDriver`
 : Shell code to run before compiling `Setup.hs`.
@@ -276,7 +276,7 @@ If unset, all available targets are built and installed.
 
 Since `haskellPackages.mkDerivation` is intended to be generated from cabal
 files, it reflects cabal's way of specifying dependencies. For one, dependencies
-are grouped by what part of the package they belong to. This helps reducing the
+are grouped by what part of the package they belong to. This helps to reduce the
 dependency closure of a derivation, for example benchmark dependencies are not
 included if `doBenchmark == false`.
 
@@ -299,20 +299,20 @@ The other categorization relates to the way the package depends on the dependenc
 
 `*ToolDepends`
 : Tools we need to run as part of the build process.
-  They are added to the derivation's `nativeBuildInputs`.
+They are added to the derivation's `nativeBuildInputs`.
 
 `*HaskellDepends`
 : Haskell libraries the package depends on.
-  They are added to `propagatedBuildInputs`.
+They are added to `propagatedBuildInputs`.
 
 `*SystemDepends`
 : Non-Haskell libraries the package depends on.
-  They are added to `buildInputs`
+They are added to `buildInputs`
 
 `*PkgconfigDepends`
 : `*SystemDepends` which are discovered using `pkg-config`.
-  They are added to `buildInputs` and it is additionally
-  ensured that `pkg-config` is available at build time.
+They are added to `buildInputs` and it is additionally
+ensured that `pkg-config` is available at build time.
 
 `*FrameworkDepends`
 : Apple SDK Framework which the package depends on when compiling it on Darwin.
@@ -385,10 +385,10 @@ the [Meta-attributes section](#chap-meta) for their documentation.
 
 ## Development environments {#sec-haskell-development-environments}
 
-Besides building and installing Haskell software, nixpkgs can also provide
-development environments for Haskell projects. This has the obvious advantage
-that you benefit from `cache.nixos.org` and no longer need to compile all
-project dependencies yourself.
+In addition to building and installing Haskell software, nixpkgs can also
+provide development environments for Haskell projects. This has the obvious
+advantage that you benefit from `cache.nixos.org` and no longer need to compile
+all project dependencies yourself.
 
 Our main objective with `haskellPackages` is to package Haskell software in
 nixpkgs. This entails some limitations, partially due to self-imposed
@@ -413,7 +413,7 @@ In particular, it is not possible to get the dependencies of a legacy project
 from nixpkgs or to use a specific stack solver for compiling a project.
 
 Now for the actual development environments: By default every derivation built
-using [`haskellPackages.mkDerivation`](#haskell-mkderivation) exposes a
+using [`haskellPackages.mkDerivation`](#haskell-mkderivation) exposes an
 environment suitable for building it interactively as the `env` attribute. For
 example, if you have a local checkout of `random`, you can enter a development
 environment for it like this (if the dependencies in the development and
@@ -433,10 +433,10 @@ $ nix-shell -A haskellPackages.random.env '<nixpkgs>'
     …
 ```
 
-As you can see, the environment contains a GHC which is setup so it finds all
+As you can see, the environment contains a GHC which is , so it finds all
 dependencies of `random`. Since nixpkgs only relies on `Setup.hs` for actually
 building the package, the environment doesn't contain familiar development tools
-like `cabal-install`. If you have it installed on your system anyways, it will
+like `cabal-install`. If you have it installed on your system anyway, it will
 work as expected in the `nix-shell` (as long as you don't use `--pure`).
 
 <!-- TODO(@sternenseemann): this doesn't work in practice (anymore?)
@@ -470,7 +470,7 @@ pkgs.haskellPackages.callPackage ./my-project.nix { }
 ```
 
 Using `nix-build default.nix` we can now build our project, but we can also
-enter a shell with all of the package's dependencies available using `nix-shell
+enter a shell with all the package's dependencies available using `nix-shell
 -A env default.nix`. If you have `cabal-install` installed globally, it'll work
 inside the shell as expected.
 
@@ -504,7 +504,7 @@ dependencies as well. Defaults to `[]`.
 
 `withHoogle`
 : If this is true, a `hoogle` instance will be built and added to
-`nativeBuildInputs`. Additionally its database will be populated with the
+`nativeBuildInputs`. Additionally, its database will be populated with the
 included dependencies, so you'll be able search through the documentation of
 your dependencies. Defaults to `false`.
 
@@ -577,7 +577,7 @@ haskellPackages.nix-tree.override {
 One common problem you may run into with such an override is the build failing
 with “abort because of serious configure-time warning from Cabal”. When scrolling
 up, you'll usually notice that Cabal noticed that more than one versions of the same
-package was present in the dependency graph. This usually causes a later compilation
+package was present in the dependency graph. This typically causes a later compilation
 failure (the error message `haskellPackages.mkDerivation` produces tries to save
 you the time of finding this out yourself, but if you wish to do so, you can
 disable it using `allowInconsistentDependencies`). Luckily, `haskellPackages` provides
@@ -597,7 +597,7 @@ haskellPackages.haskell-ci.overrideScope (self: super: {
 
 The custom interface comes into play when you want to override the arguments
 passed to `haskellPackages.mkDerivation`. For this, the function `overrideCabal`
-from `haskell.lib.compose` is used. E. g. if you want to install a man page
+from `haskell.lib.compose` is used. E.g. if you want to install a man page
 that is distributed with the package, you can do something like this:
 
 ```nix
@@ -724,7 +724,7 @@ instead of building the package `drv`.
 
 `buildFromSdist drv`
 : Uses `sdistTarball drv` as the source to compile `drv`. This helps to catch
-packaging bugs when building from a local directory, e. g. when required files
+packaging bugs when building from a local directory, e.g. when required files
 are missing from `extra-source-files`.
 
 `failOnAllWarnings drv`
@@ -740,7 +740,7 @@ check.
 
 `enableDWARFDebugging drv`
 : Compiles the package with additional debug symbols enabled, useful
-for debugging with e. g. `gdb`.
+for debugging with e.g. `gdb`.
 
 `doStrip drv`
 : Sets `doStrip` to `true` for `drv`.
@@ -763,7 +763,7 @@ for debugging with e. g. `gdb`.
 
 `dontHaddock drv`
 : Sets `doHaddock` to `false` for `drv`. Useful if the build of a package is
-failing because of e. g. a syntax error in the Haddock documentation.
+failing because of e.g. a syntax error in the Haddock documentation.
 
 `doHyperlinkSource drv`
 : Sets `hyperlinkSource` to `true` for `drv`.
@@ -779,7 +779,7 @@ failing because of e. g. a syntax error in the Haddock documentation.
 flaky or otherwise problematic test suite breaking the build.
 
 <!-- Purposefully omitting the non-list variants here. They are a bit
-ugly and we may want to deprecate them at some point. -->
+ugly, and we may want to deprecate them at some point. -->
 
 `appendConfigureFlags list drv`
 : Adds the strings in `list` to the `configureFlags` argument for `drv`.
@@ -858,7 +858,7 @@ in nixpkgs' `CONTRIBUTING.md` in general. In particular refer to the
 [backporting policy](https://github.com/NixOS/nixpkgs/blob/master/CONTRIBUTING.md#criteria-for-backporting-changes)
 to check if the change you have in mind may be backported.
 
-This section focuses on how to backport a package update (e. g. a
+This section focuses on how to backport a package update (e.g. a
 bug fix or security release). Fixing a broken package works like
 it does for the unstable branches.
 
