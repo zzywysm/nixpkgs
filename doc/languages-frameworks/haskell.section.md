@@ -10,8 +10,8 @@ area sacrifices have been made due to self-imposed restrictions in
 nixpkgs, to lessen the maintenance effort and improve performance.
 Therefore it may be advantageous to use an alternative to the
 Haskell infrastructure in nixpkgs for development environments in
-many cases. The main limitations are that we only provide first-class
-support for the default compiler (currently GHC 8.10.4) and usually
+some cases. The main limitations are that we only provide first-class
+support for the default compiler (currently GHC 8.10.7) and usually
 only provide a default and (if different) the latest version of
 a haskell package.
 
@@ -73,17 +73,22 @@ You can list all available compilers like this:
 
 ```console
 $ nix-env -f "<nixpkgs>" -qaP -A haskell.compiler
-haskell.compiler.ghc8102Binary           ghc-8.10.2-binary
-haskell.compiler.ghc8102BinaryMinimal    ghc-8.10.2-binary
-haskell.compiler.ghc8104                 ghc-8.10.4
-haskell.compiler.integer-simple.ghc8104  ghc-8.10.4
-haskell.compiler.ghc865Binary            ghc-8.6.5-binary
+haskell.compiler.ghc8107                 ghc-8.10.7
 haskell.compiler.ghc884                  ghc-8.8.4
-haskell.compiler.integer-simple.ghc884   ghc-8.8.4
-haskell.compiler.ghc901                  ghc-9.0.1
-haskell.compiler.integer-simple.ghc901   ghc-9.0.1
-haskell.compiler.ghcHEAD                 ghc-9.3.20210504
-haskell.compiler.native-bignum.ghcHEAD   ghc-9.3.20210504
+haskell.compiler.ghc902                  ghc-9.0.2
+haskell.compiler.ghc921                  ghc-9.2.1
+haskell.compiler.ghcHEAD                 ghc-9.3.20211111
+haskell.compiler.ghc8102Binary           ghc-binary-8.10.2
+haskell.compiler.ghc8102BinaryMinimal    ghc-binary-8.10.2
+haskell.compiler.ghc8107Binary           ghc-binary-8.10.7
+haskell.compiler.ghc8107BinaryMinimal    ghc-binary-8.10.7
+haskell.compiler.ghc865Binary            ghc-binary-8.6.5
+haskell.compiler.integer-simple.ghc8107  ghc-integer-simple-8.10.7
+haskell.compiler.integer-simple.ghc884   ghc-integer-simple-8.8.4
+haskell.compiler.native-bignum.ghc902    ghc-native-bignum-9.0.2
+haskell.compiler.native-bignum.ghc921    ghc-native-bignum-9.2.1
+haskell.compiler.native-bignum.ghcHEAD   ghc-native-bignum-9.3.20211111
+haskell.compiler.ghcjs                   ghcjs-8.10.7
 ```
 
 Every of those compilers has a corresponding attribute set built
@@ -166,11 +171,11 @@ instead.
   Defaults to `true` if supported.
 
 `enableLibraryProfiling`
-: Whether to enable [profiling](https://downloads.haskell.org/~ghc/8.10.4/docs/html/users_guide/profiling.html)
+: Whether to enable [profiling](https://downloads.haskell.org/~ghc/8.10.7/docs/html/users_guide/profiling.html)
   for libraries contained in the package. Enabled by default if supported.
 
 `enableExecutableProfiling`
-: Whether to enable [profiling](https://downloads.haskell.org/~ghc/8.10.4/docs/html/users_guide/profiling.html)
+: Whether to enable [profiling](https://downloads.haskell.org/~ghc/8.10.7/docs/html/users_guide/profiling.html)
   for executables contained in the package. Disabled by default.
 
 `profilingDetail`
@@ -221,7 +226,7 @@ instead.
 
 `doCoverage`
 : Whether to generate and install files needed for
-  [HPC](https://downloads.haskell.org/~ghc/8.10.4/docs/html/users_guide/profiling.html#observing-code-coverage).
+  [HPC](https://downloads.haskell.org/~ghc/8.10.7/docs/html/users_guide/profiling.html#observing-code-coverage).
   Defaults to `false`.
 
 `doHaddock`
