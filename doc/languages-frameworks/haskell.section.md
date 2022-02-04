@@ -416,7 +416,7 @@ Thus, to get the best experience, make sure that your project
 can be compiled using the default compiler of nixpkgs and
 recent versions of its dependencies. “Recent” can either
 mean the version contained in a certain Stackage snapshot
-(the latest lts or nightly one) <!-- TODO document our use of solvers -->
+(the latest lts or nightly one) <!-- TODO(@sternenseemann): document our use of solvers -->
 or the latest version from Hackage. Similarly to Stackage,
 we sometimes intervene and downgrade packages to ensure
 as many packages as possible can be compiled together.
@@ -454,11 +454,16 @@ the package, the environment doesn't contain familiar
 development tools like `cabal-install`. If you have
 it installed on your system anyways, it will work
 as expected in the `nix-shell` (as long as you don't
-use `--pure`). You can make sure that `cabal-install`
+use `--pure`).
+
+<!-- TODO(@sternenseemann): this doesn't work in practice (anymore?)
+
+You can make sure that `cabal-install`
 doesn't download or build any packages not provided
 using Nix by passing `--offline`. There is of course
 a better way to add any number of development tools
 to your `nix-shell` which we'll discuss later.
+-->
 
 Often you won't work on a package that is already
 part of `haskellPackages` or Hackage, so we first
@@ -478,8 +483,7 @@ ready to be `callPackage`-ed. For now, we can add a
 minimal `default.nix` which does just that:
 
 ```nix
-# Retrieve nixpkgs impurely from NIX_PATH for now,
-# you can pin it instead, of course.
+# Retrieve nixpkgs impurely from NIX_PATH for now, you can pin it instead, of course.
 { pkgs ? import <nixpkgs> {} }:
 
 # use the nixpkgs default haskell package set
@@ -582,6 +586,8 @@ pkgs.haskellPackages.shellFor {
   distribution_nixpkgs_datadir = toString ./distribution-nixpkgs;
 }
 ```
+
+<!-- TODO(@sternenseemann): deps are not included if not selected -->
 
 ## Overriding haskell packages {#sec-haskell-overriding-haskell-packages}
 
