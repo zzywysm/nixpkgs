@@ -129,14 +129,14 @@ but uses the underlying `Cabal` library instead.
 
 `src`
 : Source of the package. If omitted, fetch package corresponding to `pname`
-  and `version` from hackage.
+and `version` from hackage.
 
 `sha256`
 : Hash to use for the default case of `src`.
 
 `revision`
 : Revision number of the updated cabal file to fetch from hackage.
-  If `null` (which is the default value), the one included in `src` is used.
+If `null` (which is the default value), the one included in `src` is used.
 
 `editedCabalFile`
 : `sha256` hash of the cabal file identified by `revision` or `null`.
@@ -157,47 +157,47 @@ but uses the underlying `Cabal` library instead.
 
 `doHoogle`
 : Whether to generate a index file for [hoogle](https://wiki.haskell.org/Hoogle)
-  as part of `haddockPhase` by passing the
-  [--hoogle option](https://haskell-haddock.readthedocs.io/en/latest/invoking.html#cmdoption-hoogle).
-  Defaults to `true`.
+as part of `haddockPhase` by passing the
+[--hoogle option](https://haskell-haddock.readthedocs.io/en/latest/invoking.html#cmdoption-hoogle).
+Defaults to `true`.
 
 `doHaddockQuickjump`
 : Whether to generate an index for interactive navigation of the HTML documentation.
-  Defaults to `true` if supported.
+Defaults to `true` if supported.
 
 `enableLibraryProfiling`
 : Whether to enable [profiling](https://downloads.haskell.org/~ghc/8.10.7/docs/html/users_guide/profiling.html)
-  for libraries contained in the package. Enabled by default if supported.
+for libraries contained in the package. Enabled by default if supported.
 
 `enableExecutableProfiling`
 : Whether to enable [profiling](https://downloads.haskell.org/~ghc/8.10.7/docs/html/users_guide/profiling.html)
-  for executables contained in the package. Disabled by default.
+for executables contained in the package. Disabled by default.
 
 `profilingDetail`
 : [Profiling detail level](https://cabal.readthedocs.io/en/latest/cabal-project.html#cfg-field-profiling-detail)
-  to set. Defaults to `exported-functions`.
+to set. Defaults to `exported-functions`.
 
 `enableSharedExecutables`
 : Whether to link executables dynamically. By default, executables are linked statically.
 
 `enableSharedLibraries`
 : Whether to build shared Haskell libraries. This is enabled by default unless we are using
-  `pkgsStatic` or shared libraries have been disabled in GHC.
+`pkgsStatic` or shared libraries have been disabled in GHC.
 
 `enableStaticLibraries`
 : Whether to build static libraries. Enabled by default if supported.
 
 `enableDeadCodeElimination`
 : Whether to enable linker based dead code elimination in GHC.
-  Enabled by default if supported.
+Enabled by default if supported.
 
 `enableHsc2hsViaAsm`
 : Whether to pass `--via-asm` to `hsc2hs`.
 
 `hyperlinkSource`
 : Whether to render the source as well as part of the haddock documentation
-  by passing [--hyperlinked-source](https://haskell-haddock.readthedocs.io/en/latest/invoking.html#cmdoption-hyperlinked-source).
-  Defaults to `true`.
+by passing [--hyperlinked-source](https://haskell-haddock.readthedocs.io/en/latest/invoking.html#cmdoption-hyperlinked-source).
+Defaults to `true`.
 
 `isExecutable`
 : Whether the package contains an executable.
@@ -207,26 +207,26 @@ but uses the underlying `Cabal` library instead.
 
 `jailbreak`
 : Whether to execute [jailbreak-cabal](https://github.com/peti/jailbreak-cabal/)
-  before `configurePhase` to lift any version version constraints in the cabal file.
-  Note that this can't lift version bounds if they are conditional, e. g. if a
-  dependency is hidden behind a flag.
+before `configurePhase` to lift any version version constraints in the cabal file.
+Note that this can't lift version bounds if they are conditional, e. g. if a
+dependency is hidden behind a flag.
 
 `enableParallelBuilding`
 : Whether to use the `-j` flag to start multiple GHC jobs in parallel.
 
 `maxBuildCores`
 : Upper limit of jobs to use in parallel for compilation regardless of `$NIX_BUILD_CORES`.
-  Defaults to 16 as haskell compilation with GHC currently sees a performance regression
-  if too many parallel jobs are used.
+Defaults to 16 as haskell compilation with GHC currently sees a performance regression
+if too many parallel jobs are used.
 
 `doCoverage`
 : Whether to generate and install files needed for
-  [HPC](https://downloads.haskell.org/~ghc/8.10.7/docs/html/users_guide/profiling.html#observing-code-coverage).
-  Defaults to `false`.
+[HPC](https://downloads.haskell.org/~ghc/8.10.7/docs/html/users_guide/profiling.html#observing-code-coverage).
+Defaults to `false`.
 
 `doHaddock`
 : Wether to build (HTML) documentation using [haddock](https://www.haskell.org/haddock/).
-  Defaults to `true` if supported.
+Defaults to `true` if supported.
 
 `testTarget`
 : Name of the test suite to build and run. If unset, all test suite will be executed.
@@ -245,35 +245,35 @@ but uses the underlying `Cabal` library instead.
 
 `coreSetup`
 : Whether to only allow core libraries to be used while building `Setup.hs`.
-  Defaults to `false`.
+Defaults to `false`.
 
 `useCpphs`
 : Whether to enable the [cpphs](https://archives.haskell.org/projects.haskell.org/cpphs/)
-  preprocessor. Defaults to `false`.
+preprocessor. Defaults to `false`.
 
 `enableSeparateBinOutput`
 : Whether to install executables to a separate `bin` output. Defaults to `false`.
 
 `enableSeparateDataOutput`
 : Whether to install data files shipped with the package to a separate `data` output.
-  Defaults to `false`.
+Defaults to `false`.
 
 `enableSeparateDocOutput`
 : Whether to install documentation to a separate `doc` output.
-  Is automatically enabled if `doHaddock` is `true`.
+Is automatically enabled if `doHaddock` is `true`.
 
 `allowInconsistentDependencies`
 : If enabled, allow multiple versions of the same package at configure time.
-  Usually in such a situation compilation would later fail. Defaults to `false`.
+Usually in such a situation compilation would later fail. Defaults to `false`.
 
 `enableLibraryForGhci`
 : Build and install a special object file for GHCi. This improves performance
-  when loading the library in the REPL, but requires extra build time and
-  disk space. Defaults to `false`.
+when loading the library in the REPL, but requires extra build time and
+disk space. Defaults to `false`.
 
 `buildTarget`
 : Name of the executable or library to build and install.
-  If unset, all available targets are built and installed.
+If unset, all available targets are built and installed.
 
 ### Specifying dependencies
 
