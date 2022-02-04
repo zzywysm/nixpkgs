@@ -1,19 +1,18 @@
 # Haskell {#sec-haskell}
 
-The Haskell infrastructure in nixpkgs has two main purposes: The
-primary purpose is to provide a Haskell compiler and build tools
-as well as infrastructure for packaging Haskell-based packages.
+The Haskell infrastructure in nixpkgs has two main purposes: The primary purpose
+is to provide a Haskell compiler and build tools as well as infrastructure for
+packaging Haskell-based packages.
 
-The secondary purpose is to provide support for Haskell development
-environment including prebuilt Haskell libraries. However, in this
-area sacrifices have been made due to self-imposed restrictions in
-nixpkgs, to lessen the maintenance effort and improve performance.
-Therefore it may be advantageous to use an alternative to the
-Haskell infrastructure in nixpkgs for development environments in
-some cases. The main limitations are that we only provide first-class
-support for the default compiler (currently GHC 8.10.7) and usually
-only provide a default and (if different) the latest version of
-a haskell package.
+The secondary purpose is to provide support for Haskell development environment
+including prebuilt Haskell libraries. However, in this area sacrifices have been
+made due to self-imposed restrictions in nixpkgs, to lessen the maintenance
+effort and improve performance. Therefore it may be advantageous to use an
+alternative to the Haskell infrastructure in nixpkgs for development
+environments in some cases. The main limitations are that we only provide
+first-class support for the default compiler (currently GHC 8.10.7) and usually
+only provide a default and (if different) the latest version of a haskell
+package.
 
 ## Available packages {#sec-haskell-available-packages}
 
@@ -22,19 +21,17 @@ The compiler and most build tools are exposed at the top level:
 * `ghc` is the default version of GHC
 * Language specific tools: `cabal-install`, `stack`, `hpack`, `alex`, `happy`, …
 
-Many “normal” user facing packages written in Haskell, like `niv` or
-`cachix`, are also exposed at the top level, so there is nothing
-haskell specific to installing and using them.
+Many “normal” user facing packages written in Haskell, like `niv` or `cachix`,
+are also exposed at the top level, so there is nothing haskell specific to
+installing and using them.
 
-All of these packages originally live in the `haskellPackages` package
-set and are re-exposed with a reduced dependency closure for
-convenience.
+All of these packages originally live in the `haskellPackages` package set and
+are re-exposed with a reduced dependency closure for convenience.
 
-The `haskellPackages` set includes at least one version of every package
-from hackage as well as some manually injected packages. This amounts to
-a lot of packages, so it is hidden from `nix-env -qa` by default for
-performance reasons. You can still list all packages in the set like
-this, though:
+The `haskellPackages` set includes at least one version of every package from
+hackage as well as some manually injected packages. This amounts to a lot of
+packages, so it is hidden from `nix-env -qa` by default for performance reasons.
+You can still list all packages in the set like this, though:
 
 ```console
 $ nix-env -f "<nixpkgs>" -qaP -A haskellPackages
@@ -46,30 +43,29 @@ haskellPackages.abcBridge                                                   abcB
 …
 ```
 
-The attribute names in `haskellPackages` always correspond with their
-name on hackage. Since hackage allows names that are not valid nix
-without extra escaping, you sometimes need to extra care when handling
-attribute names like `3dmodels`.
+The attribute names in `haskellPackages` always correspond with their name on
+hackage. Since hackage allows names that are not valid nix without extra
+escaping, you sometimes need to extra care when handling attribute names like
+`3dmodels`.
 
-For packages that are part of stackage, we use the version that is
-currently part of [Stackage Nightly](https://www.stackage.org/nightly)
-as the default version. For all other packages we use the latest
-version from Hackage. Sometimes alternative versions of packages
-are provided whose attribute names are their normal name with
-their version appended after an underscore, e. g. `Cabal_3_4_0_0`.
-If you are interested in details how the package set is populated,
-read the section [Package set generation](#sec-haskell-package-set-generation).
+For packages that are part of stackage, we use the version that is currently
+part of [Stackage Nightly](https://www.stackage.org/nightly) as the default
+version. For all other packages we use the latest version from Hackage.
+Sometimes alternative versions of packages are provided whose attribute names
+are their normal name with their version appended after an underscore, e. g.
+`Cabal_3_4_0_0`. If you are interested in details how the package set is
+populated, read the section [Package set
+generation](#sec-haskell-package-set-generation).
 
-Most of the packages contained in `haskellPackages` don't actually
-build and are marked as broken semi-automatically. Most of those
-packages are deprecated or unmaintained, but sometimes packages
-that should, don't build. Very often fixing them is not a lot of
-work. How you can help with that is described in [Fixing a broken
-package](#sec-haskell-fixing-a-broken-package).
+Most of the packages contained in `haskellPackages` don't actually build and are
+marked as broken semi-automatically. Most of those packages are deprecated or
+unmaintained, but sometimes packages that should, don't build. Very often fixing
+them is not a lot of work. How you can help with that is described in [Fixing a
+broken package](#sec-haskell-fixing-a-broken-package).
 
-`haskellPackages` is built with our default compiler, but we also
-provide other releases of GHC and package sets built with them.
-You can list all available compilers like this:
+`haskellPackages` is built with our default compiler, but we also provide other
+releases of GHC and package sets built with them. You can list all available
+compilers like this:
 
 ```console
 $ nix-env -f "<nixpkgs>" -qaP -A haskell.compiler
@@ -91,11 +87,11 @@ haskell.compiler.native-bignum.ghcHEAD   ghc-native-bignum-9.3.20211111
 haskell.compiler.ghcjs                   ghcjs-8.10.7
 ```
 
-Every of those compilers has a corresponding attribute set built
-completely using it. However, the non-standard package sets are
-not tested regularly and have less working packages as a result.
-The corresponding package set for GHC 9.0.1 is `haskell.packages.ghc901`
-(in fact `haskellPackages` is just an alias for `haskell.packages.ghc8104`):
+Every of those compilers has a corresponding attribute set built completely
+using it. However, the non-standard package sets are not tested regularly and
+have less working packages as a result. The corresponding package set for GHC
+9.0.1 is `haskell.packages.ghc901` (in fact `haskellPackages` is just an alias
+for `haskell.packages.ghc8104`):
 
 ```console
 $ nix-env -f "<nixpkgs>" -qaP -A haskell.packages.ghc901
@@ -110,19 +106,18 @@ Every package set also re-exposes its GHC as `haskell.packages.*.ghc`.
 
 ## `haskellPackages.mkDerivation` {#haskell-mkderivation}
 
-Every haskell package set has its own haskell-aware `mkDerivation` which
-is used to build its packages. Generally you won't have to interact with
-this builder since [cabal2nix](https://github.com/nixos/cabal2nix) can
-generate packages using it for an arbitrary cabal package definition.
-Still it is useful to know the parameters it takes when you need to
+Every haskell package set has its own haskell-aware `mkDerivation` which is used
+to build its packages. Generally you won't have to interact with this builder
+since [cabal2nix](https://github.com/nixos/cabal2nix) can generate packages
+using it for an arbitrary cabal package definition. Still it is useful to know
+the parameters it takes when you need to
 [override](#sec-haskell-overriding-haskell-packages) a generated nix expression.
 
-`haskellPackages.mkDerivation` is a wrapper around `stdenv.mkDerivation`
-which re-defines the default phases to be haskell aware and handles
-dependency specification, test suites, benchmarks etc. by compiling
-and invoking the package's `Setup.hs`. It does *not* use or invoke
-the `cabal-install` binary, but uses the underlying `Cabal` library
-instead.
+`haskellPackages.mkDerivation` is a wrapper around `stdenv.mkDerivation` which
+re-defines the default phases to be haskell aware and handles dependency
+specification, test suites, benchmarks etc. by compiling and invoking the
+package's `Setup.hs`. It does *not* use or invoke the `cabal-install` binary,
+but uses the underlying `Cabal` library instead.
 
 ### General arguments
 
@@ -282,9 +277,9 @@ instead.
 
 ### Specifying dependencies
 
-Since `haskellPackages.mkDerivation` is intended to be generated from cabal files,
-it reflects cabal's way of specifying dependencies. For one, dependencies are
-grouped by what part of the package they belong to. This helps reducing the
+Since `haskellPackages.mkDerivation` is intended to be generated from cabal
+files, it reflects cabal's way of specifying dependencies. For one, dependencies
+are grouped by what part of the package they belong to. This helps reducing the
 dependency closure of a derivation, for example benchmark dependencies are not
 included if `doBenchmark == false`.
 
@@ -303,8 +298,7 @@ included if `doBenchmark == false`.
 `benchmark*Depends`
 : dependencies of a benchmark contained in the package
 
-The other categorization relates to the way the package depends on
-the dependency:
+The other categorization relates to the way the package depends on the dependency:
 
 `*ToolDepends`
 : Tools we need to run as part of the build process.
@@ -326,8 +320,8 @@ the dependency:
 `*FrameworkDepends`
 : Apple SDK Framework which the package depends on when compiling it on Darwin.
 
-Using these two distinctions, you should be able to categorize most of
-the dependency specifications that are available:
+Using these two distinctions, you should be able to categorize most of the dependency
+specifications that are available:
 `benchmarkFrameworkDepends`,
 `benchmarkHaskellDepends`,
 `benchmarkPkgconfigDepends`,
@@ -377,10 +371,9 @@ recommended to use the more accurate ones listed above when possible.
 
 ### Meta attributes
 
-`haskellPackages.mkDerivation` accepts the following attributes as
-direct arguments which are transparently set in `meta` of the resulting
-derivation. See the [Meta-attributes section](#chap-meta) for their
-documentation.
+`haskellPackages.mkDerivation` accepts the following attributes as direct
+arguments which are transparently set in `meta` of the resulting derivation. See
+the [Meta-attributes section](#chap-meta) for their documentation.
 
 * These attributes are populated with a default value if omitted:
     * `homepage`: defaults to the hackage page for `pname`.
@@ -395,43 +388,39 @@ documentation.
 
 ## Development environments {#sec-haskell-development-environments}
 
-Besides building and installing Haskell software, nixpkgs can also
-provide development environments for Haskell projects. This has the
-obvious advantage that you benefit from `cache.nixos.org` and no
-longer need to compile all project dependencies yourself.
+Besides building and installing Haskell software, nixpkgs can also provide
+development environments for Haskell projects. This has the obvious advantage
+that you benefit from `cache.nixos.org` and no longer need to compile all
+project dependencies yourself.
 
-Our main objective with `haskellPackages` is to package Haskell
-software in nixpkgs. This entails some limitations, partially
-due to self-imposed restrictions of nixpkgs, partially in the
-name of maintainability:
+Our main objective with `haskellPackages` is to package Haskell software in
+nixpkgs. This entails some limitations, partially due to self-imposed
+restrictions of nixpkgs, partially in the name of maintainability:
 
-* Only the packages built with the default compiler see extensive
-  testing of the whole package set. The experience using an older
-  or newer packaged compiler may be worse.
+* Only the packages built with the default compiler see extensive testing of the
+  whole package set. The experience using an older or newer packaged compiler
+  may be worse.
 
-* We aim for a “blessed” package set which only contains one
-  version of each package.
+* We aim for a “blessed” package set which only contains one version of each
+  package.
 
-Thus, to get the best experience, make sure that your project
-can be compiled using the default compiler of nixpkgs and
-recent versions of its dependencies. “Recent” can either
-mean the version contained in a certain Stackage snapshot
+Thus, to get the best experience, make sure that your project can be compiled
+using the default compiler of nixpkgs and recent versions of its dependencies.
+“Recent” can either mean the version contained in a certain Stackage snapshot
 (the latest lts or nightly one) <!-- TODO(@sternenseemann): document our use of solvers -->
-or the latest version from Hackage. Similarly to Stackage,
-we sometimes intervene and downgrade packages to ensure
-as many packages as possible can be compiled together.
+or the latest version from Hackage. Similarly to Stackage, we sometimes
+intervene and downgrade packages to ensure as many packages as possible can
+be compiled together.
 
-In particular, it is not possible to get the dependencies
-of a legacy project from nixpkgs or to use a specific
-stack solver for compiling a project.
+In particular, it is not possible to get the dependencies of a legacy project
+from nixpkgs or to use a specific stack solver for compiling a project.
 
-Now for the actual development environments: By default
-every derivation built using [`haskellPackages.mkDerivation`](#haskell-mkderivation)
-exposes a environment suitable for building it interactively
-as the `env` attribute. For example, if you have a local
-checkout of `random`, you can enter a development environment
-for it like this (if the dependencies in the development
-and packaged version match):
+Now for the actual development environments: By default every derivation built
+using [`haskellPackages.mkDerivation`](#haskell-mkderivation) exposes a
+environment suitable for building it interactively as the `env` attribute. For
+example, if you have a local checkout of `random`, you can enter a development
+environment for it like this (if the dependencies in the development and
+packaged version match):
 
 ```console
 $ cd ~/src/random
@@ -447,30 +436,23 @@ $ nix-shell -A haskellPackages.random.env '<nixpkgs>'
     …
 ```
 
-As you can see, the environment contains a GHC which is
-setup so it finds all dependencies of `random`. Since
-nixpkgs only relies on `Setup.hs` for actually building
-the package, the environment doesn't contain familiar
-development tools like `cabal-install`. If you have
-it installed on your system anyways, it will work
-as expected in the `nix-shell` (as long as you don't
-use `--pure`).
+As you can see, the environment contains a GHC which is setup so it finds all
+dependencies of `random`. Since nixpkgs only relies on `Setup.hs` for actually
+building the package, the environment doesn't contain familiar development tools
+like `cabal-install`. If you have it installed on your system anyways, it will
+work as expected in the `nix-shell` (as long as you don't use `--pure`).
 
 <!-- TODO(@sternenseemann): this doesn't work in practice (anymore?)
 
-You can make sure that `cabal-install`
-doesn't download or build any packages not provided
-using Nix by passing `--offline`. There is of course
-a better way to add any number of development tools
-to your `nix-shell` which we'll discuss later.
--->
+You can make sure that `cabal-install` doesn't download or build any packages
+not provided using Nix by passing `--offline`. There is of course a better way
+to add any number of development tools to your `nix-shell` which we'll discuss
+later. -->
 
-Often you won't work on a package that is already
-part of `haskellPackages` or Hackage, so we first
-need to write a Nix expression to obtain the development
-environment from. Luckily, we can generate one
-very easily from an already existing cabal file
-using `cabal2nix`:
+Often you won't work on a package that is already part of `haskellPackages` or
+Hackage, so we first need to write a Nix expression to obtain the development
+environment from. Luckily, we can generate one very easily from an already
+existing cabal file using `cabal2nix`:
 
 ```console
 $ ls
@@ -478,9 +460,9 @@ my-project.cabal src …
 $ cabal2nix ./. > my-project.nix
 ```
 
-The generated nix expression evaluates to a function
-ready to be `callPackage`-ed. For now, we can add a
-minimal `default.nix` which does just that:
+The generated nix expression evaluates to a function ready to be
+`callPackage`-ed. For now, we can add a minimal `default.nix` which does just
+that:
 
 ```nix
 # Retrieve nixpkgs impurely from NIX_PATH for now, you can pin it instead, of course.
@@ -490,68 +472,55 @@ minimal `default.nix` which does just that:
 pkgs.haskellPackages.callPackage ./my-project.nix { }
 ```
 
-Using `nix-build default.nix` we can now build our
-project, but we can also enter a shell with all
-of the package's dependencies available using
-`nix-shell -A env default.nix`. If you have
-`cabal-install` installed globally, it'll work
+Using `nix-build default.nix` we can now build our project, but we can also
+enter a shell with all of the package's dependencies available using `nix-shell
+-A env default.nix`. If you have `cabal-install` installed globally, it'll work
 inside the shell as expected.
 
-Having to install tools globally is obviously not great,
-especially if you want to provide a batteries-included
-`shell.nix` with your project. Luckily there's a proper
-tool for making development environments out of packages'
-build environments: `shellFor`, a function exposed by
-every haskell package set. It takes the following
-arguments and returns a derivation which is suitable as
-a development environment inside `nix-shell`:
+Having to install tools globally is obviously not great, especially if you want
+to provide a batteries-included `shell.nix` with your project. Luckily there's a
+proper tool for making development environments out of packages' build
+environments: `shellFor`, a function exposed by every haskell package set. It
+takes the following arguments and returns a derivation which is suitable as a
+development environment inside `nix-shell`:
 
 `packages`
-: This argument is used to select the packages for which
-to build the development environment. This should be a
-function which takes a haskell package set and returns
-a list of packages. `shellFor` will pass the used package
-set to this function and include all dependencies of the
-returned package in the build environment. This means
-you can reuse nix expressions of packages included in
-nixpkgs, but also use local nix expressions like this:
-`hpkgs: [ (hpkgs.callPackage ./my-project.nix { }) ]`.
+: This argument is used to select the packages for which to build the
+development environment. This should be a function which takes a haskell package
+set and returns a list of packages. `shellFor` will pass the used package set to
+this function and include all dependencies of the returned package in the build
+environment. This means you can reuse nix expressions of packages included in
+nixpkgs, but also use local nix expressions like this: `hpkgs: [
+(hpkgs.callPackage ./my-project.nix { }) ]`.
 
 `nativeBuildInputs`
-: Expects a list of derivations to add as build tools
-to the build environment. This is the place to add
-packages like `cabal-install`, `doctest` or `hlint`.
+: Expects a list of derivations to add as build tools to the build environment.
+This is the place to add packages like `cabal-install`, `doctest` or `hlint`.
 Defaults to `[]`.
 
 `buildInputs`
-: Expects a list of derivations to add as library
-dependencies, like `openssl`. This is rarely
-necessary as the haskell package expressions
-usually track system dependencies as well.
-Defaults to `[]`.
+: Expects a list of derivations to add as library dependencies, like `openssl`.
+This is rarely necessary as the haskell package expressions usually track system
+dependencies as well. Defaults to `[]`.
 
 <!-- TODO link specifying deps section here -->
 
 `withHoogle`
-: If this is true, a `hoogle` instance will be
-built and added to `nativeBuildInputs`. Additionally
-its database will be populated with the included
-dependencies, so you'll be able search through
-the documentation of your dependencies.
-Defaults to `false`.
+: If this is true, a `hoogle` instance will be built and added to
+`nativeBuildInputs`. Additionally its database will be populated with the
+included dependencies, so you'll be able search through the documentation of
+your dependencies. Defaults to `false`.
 
 `genericBuilderArgsModifier`
-: This argument accepts a function allowing you to modify
-the arguments passed to `mkDerivation` in order to create
-the development environment. For example, `args: { doCheck = false; }`
-would cause the environment to not include any test dependencies.
-Defaults to `lib.id`.
+: This argument accepts a function allowing you to modify the arguments passed
+to `mkDerivation` in order to create the development environment. For example,
+`args: { doCheck = false; }` would cause the environment to not include any test
+dependencies. Defaults to `lib.id`.
 
 `doBenchmark`
 : This is a shortcut for setting `doBenchmark` via `genericBuilderArgsModifier`.
-Setting it to `true` will cause the development environment to include
-all benchmark dependencies which would be excluded by default.
-Defaults to `false`.
+Setting it to `true` will cause the development environment to include all
+benchmark dependencies which would be excluded by default. Defaults to `false`.
 
 One neat property of `shellFor` is that it allows you to work on multiple
 packages using the same environment in conjunction with
@@ -685,9 +654,9 @@ lib.pipe my-haskell-package [
 The base interface for all overriding is the following function:
 
 `overrideCabal f drv`
-: Takes the arguments passed to obtain `drv` to `f` and uses the resulting attribute set
-to update the argument set. Then a recomputed version of `drv` using the new argument
-set is returned.
+: Takes the arguments passed to obtain `drv` to `f` and uses the resulting
+attribute set to update the argument set. Then a recomputed version of `drv`
+using the new argument set is returned.
 
 <!--
 TODO(@sternenseemann): ideally we want to be more detailed here as well, but
