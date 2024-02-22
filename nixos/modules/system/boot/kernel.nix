@@ -278,14 +278,14 @@ in
             # "pata_marvell"
 
             # NVMe
-            "nvme"
+            # "nvme"
 
             # Standard SCSI stuff.
-            "sd_mod"
-            "sr_mod"
+            # "sd_mod"
+            # "sr_mod"
 
             # SD cards and internal eMMC drives.
-            "mmc_block"
+            # "mmc_block"
 
             # Support USB keyboards, in case the boot fails and we only have
             # a USB keyboard, or for LUKS passphrase prompt.
