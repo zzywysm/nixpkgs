@@ -269,13 +269,13 @@ in
             # compatibility.
 
             # Some SATA/PATA stuff.
-            "ahci"
-            "sata_nv"
-            "sata_via"
-            "sata_sis"
-            "sata_uli"
-            "ata_piix"
-            "pata_marvell"
+            # "ahci"
+            # "sata_nv"
+            # "sata_via"
+            # "sata_sis"
+            # "sata_uli"
+            # "ata_piix"
+            # "pata_marvell"
 
             # NVMe
             "nvme"
@@ -289,11 +289,11 @@ in
 
             # Support USB keyboards, in case the boot fails and we only have
             # a USB keyboard, or for LUKS passphrase prompt.
-            "uhci_hcd"
-            "ehci_hcd"
-            "ehci_pci"
-            "ohci_hcd"
-            "ohci_pci"
+            # "uhci_hcd"
+            # "ehci_hcd"
+            # "ehci_pci"
+            # "ohci_hcd"
+            # "ohci_pci"
             "xhci_hcd"
             "xhci_pci"
             "usbhid"
